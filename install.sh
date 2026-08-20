@@ -243,6 +243,13 @@ if ask_yes_no "===> Do you want to setup zspace config now?"; then
     copy_file "$SOURCE_COMMON_CONFIG/hypr/hyprlock.conf" "$DEST_CONFIG/hypr/hyprlock.conf"
     copy_file "$SOURCE_COMMON_CONFIG/hypr/hyprlock_tiny.conf" "$DEST_CONFIG/hypr/hyprlock_tiny.conf"
 
+    echo ">>> Deploying Once configs..."
+    for folder in "$SOURCE_ONCE_CONFIG"/*/; do
+        [[ -d "$folder" ]] || continue
+        folder_name="$(basename "$folder")"
+        copy_dir_content "$SOURCE_ONCE_CONFIG/$folder_name" "$DEST_CONFIG/$folder_name"
+    done
+
     # Loop through selected WMs (hyprland will always be last if "ALL" was chosen)
     for i in "${!SELECTED_WMS[@]}"; do
         WM_NAME="${SELECTED_WMS[$i]}"
@@ -357,6 +364,15 @@ fi
 
 # Init ZSpace Control
 check_control_dir
+
+# NixOS configuration update
+if command -v nixos-rebuild >/dev/null 2>&1; then
+    if ask_yes_no "===> NixOS configuration updated. Do you want to rebuild NixOS system now? (maybe have some conflicts)"; then
+        sudo nixos-rebuild switch
+    else
+        log_warn "You chose not to rebuild NixOS system. Please remember to run 'sudo nixos-rebuild switch' later."
+    fi
+fi
 
 # Check if ly runit service is installed (Void Linux runit)
 if [ -d "/etc/sv/ly" ]; then

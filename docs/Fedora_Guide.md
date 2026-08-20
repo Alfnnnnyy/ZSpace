@@ -168,13 +168,13 @@ sudo dnf install code
 ```
 
 > [!tip]
-> See more optional packages: [here](https://github.com/hakuimaku/zspace/blob/main/common/pkg-optional.txt)
+> See more optional packages: [here](https://github.com/Alfnnnnyy/ZSpace/blob/main/src/packages/pkg-optional.txt)
 
 ---
 
 ## 3. Install Z Space Configurations
 
-Simply follow the instructions in the [Installation Guide](https://github.com/hakuimaku/zspace#-3)
+Simply follow the instructions in the [Installation Guide](https://github.com/Alfnnnnyy/ZSpace#installation)
 
 ---
 

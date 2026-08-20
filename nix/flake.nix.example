@@ -8,7 +8,7 @@
     inputs = {
         nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
         zspace = {
-            url = "github:hakuimaku/zspace?dir=nix";
+            url = "github:Alfnnnnyy/ZSpace?dir=nix";
             inputs.nixpkgs.follows = "nixpkgs";
         };
     };
