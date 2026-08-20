@@ -1,0 +1,47 @@
+//          _   ___      _ 
+//         / | / (_)____(_)
+//        /  |/ / / ___/ / 
+//       / /|  / / /  / /  
+//      /_/ |_/_/_/  /_/   
+//                         
+
+// This is a niri custom configuration file (small config.kdl actually :p)
+// You can add keybindings, rules, and other configurations here.
+
+// Why you should custom your config in there?
+// Because for each update, my dotfiles will override your all custom configurations.
+
+// After changes, please reload Niri by `niri msg action load-config-file` on terminal
+
+// See more in the Wiki: https://github.com/niri-wm/niri/wiki
+
+// Example
+binds {
+    Mod+Return { spawn "kitty"; }
+}
+
+
+// Rules for cava underbar, if you want to tweak it
+window-rule {
+    match app-id=r#"cavaunderbar"#
+
+    open-floating true
+    open-focused false
+    
+    default-floating-position x=0 y=-52 relative-to="top-left"
+    min-width 1920
+    min-height 70
+    max-height 70
+    opacity 0.7
+
+    background-effect {
+        xray false
+        blur false
+        noise 0
+        saturation 1
+    }
+
+    shadow {
+        off
+    }
+}

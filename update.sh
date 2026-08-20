@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+set -u
+
+cat << 'EOF'
+
+ _____ _____                      
+/  ___|  __ \                     
+\ `--.| |  \/ _ __   __ _  ___ ___
+ `--. \ | __| '_ \ / _` |/ __/ _ \
+/\__/ / |_\ \ |_) | (_| | (_|  __/
+\____/ \____/ .__/ \__,_|\___\___|
+            | |                   
+            |_|                   
+
+            >>> CONFIG UPDATER (VOID LINUX) <<<
+
+EOF
+
+ZSPACE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+
+chmod +x ./scripts/*
+source "./scripts/variables.sh"
+source "./scripts/functions.sh"
+
+# ======================================================================================
+# MAIN FLOW
+# ======================================================================================
+
+print_header
+
+# ============================================================================
+# BLOCK 0: UPDATE REPOSITORY (LATEST vs STABLE)
+# ============================================================================
+step_title "0 - UPDATE DOTFILES REPOSITORY"
+
+SCRIPT_NAME=$(basename "$0")
+BACKUP_SCRIPT="/tmp/${SCRIPT_NAME}.bak"
+
+cp "$0" "$BACKUP_SCRIPT"
+
+echo "Select update mode:"
+echo -e "${C_BOLD}[1]${C_RESET} LATEST (Pull from main branch - Try the latest changes)"
+echo -e "${C_BOLD}[2]${C_RESET} STABLE (Checkout latest release tag - Recommended for stability)"
+echo -e "${C_BOLD}[0]${C_RESET} SKIP (Do not update repository)"
+echo ""
+read -r -p ">>> Choose mode (1/2/0): " update_mode
+
+REPO_CHANGED=0
+
+if [[ "$update_mode" == "1" ]]; then
+    log_info "Switching to main branch and pulling latest changes..."
+    git -C "$ZSPACE_DIR" checkout main
+    git -C "$ZSPACE_DIR" pull origin main
+    log_ok "Repository updated to LATEST."
+    REPO_CHANGED=1
+elif [[ "$update_mode" == "2" ]]; then
+    log_info "Fetching tags from remote..."
+    git -C "$ZSPACE_DIR" fetch --tags
+    LATEST_TAG=$(git -C "$ZSPACE_DIR" describe --tags $(git -C "$ZSPACE_DIR" rev-list --tags --max-count=1) 2>/dev/null)
+    if [[ -z "$LATEST_TAG" ]]; then
+        log_warn "No tags found in repository. Falling back to main branch."
+        git -C "$ZSPACE_DIR" checkout main
+        git -C "$ZSPACE_DIR" pull origin main
+    else
+        log_info "Latest stable tag found: $LATEST_TAG"
+        git -C "$ZSPACE_DIR" checkout "$LATEST_TAG"
+        log_ok "Repository updated to STABLE ($LATEST_TAG)."
+    fi
+    REPO_CHANGED=1
+elif [[ "$update_mode" == "0" ]]; then
+    log_skip "Skipping repository update."
+else
+    log_error "Invalid choice. Skipping repository update."
+fi
+
+if [[ "$REPO_CHANGED" -eq 1 && -f "$BACKUP_SCRIPT" ]]; then
+    if ! cmp -s "$BACKUP_SCRIPT" "$0"; then
+        echo ""
+        log_warn "Detecting that '$SCRIPT_NAME' has new updates in repository!"
+        log_info "Re-executing script with updated logic..."
+        rm -f "$BACKUP_SCRIPT"
+        exec "$0" "$@"
+    fi
+    rm -f "$BACKUP_SCRIPT"
+fi
+
+# Then select window manager(s) to update configs and packages
+select_window_manager
+
+# ============================================================================
+# BLOCK 1: UPDATE PACKAGES
+# ============================================================================
+step_title "1 - UPDATE PACKAGES FROM LISTS"
+
+PKG_LABELS=()
+PKG_FILES=()
+
+for i in "${!SELECTED_WMS[@]}"; do
+    wm_name="${SELECTED_WMS[$i]}"
+    wm_upper=$(echo "$wm_name" | tr '[:lower:]' '[:upper:]')
+    PKG_LABELS+=("$wm_upper")
+    PKG_FILES+=("${SELECTED_PKG_WMS[$i]}")
+done
+
+# Add common core, service, optional packages
+PKG_LABELS+=("CORE" "SERVICE" "OPTIONAL")
+PKG_FILES+=("$PKG_CORE" "$PKG_SERVICE" "$PKG_OPTIONAL")
+
+echo ">>> Package lists to be updated automatically:"
+for i in "${!PKG_LABELS[@]}"; do
+    echo "  - ${PKG_LABELS[$i]}: ${PKG_FILES[$i]}"
+done
+echo ""
+
+if ask_yes_no "===> Do you want to install/update ALL packages now?"; then
+    for i in "${!PKG_LABELS[@]}"; do
+        label="${PKG_LABELS[$i]}"
+        file="${PKG_FILES[$i]}"
+        install_pkg_file "$label" "$file"
+    done
+    log_ok "All package installations/updates completed."
+else
+    log_skip "Skipping package installation/update."
+fi
+
+# ============================================================================
+# BLOCK 2: BACKUP AND COPY CONFIG
+# ============================================================================
+step_title "2 - BACKUP AND UPDATE CONFIG IN ~/.config"
+
+SOURCE_COMMON_CONFIG="$COMMON_DIR/config"
+DEST_CONFIG="$HOME/.config"
+
+if ask_yes_no "===> Do you want to update zspace configs now?"; then
+
+    echo ">>> Deploying Common configs..."
+    for folder in "$SOURCE_COMMON_CONFIG"/*/; do
+        [[ -d "$folder" ]] || continue
+        folder_name="$(basename "$folder")"
+        if [[ "$folder_name" == "hypr" ]]; then
+            continue
+        fi
+        copy_dir_content "$SOURCE_COMMON_CONFIG/$folder_name" "$DEST_CONFIG/$folder_name"
+    done
+    copy_file "$SOURCE_COMMON_CONFIG/hypr/hypridle.conf" "$DEST_CONFIG/hypr/hypridle.conf"
+    copy_file "$SOURCE_COMMON_CONFIG/hypr/hyprlock.conf" "$DEST_CONFIG/hypr/hyprlock.conf"
+    copy_file "$SOURCE_COMMON_CONFIG/hypr/hyprlock_tiny.conf" "$DEST_CONFIG/hypr/hyprlock_tiny.conf"
+
+    # Loop through selected WMs
+    for i in "${!SELECTED_WMS[@]}"; do
+        WM_NAME="${SELECTED_WMS[$i]}"
+        WM_DIR_PATH="${SELECTED_WM_DIRS[$i]}"
+        SOURCE_WM_CONFIG="$WM_DIR_PATH"
+
+        if [[ $WM_NAME == "hyprland" ]]; then
+            echo ">>> Deploying Hyprland configs..."
+            copy_dir_content "$SOURCE_WM_CONFIG/config" "$DEST_CONFIG/hypr/config"
+            copy_file "$SOURCE_WM_CONFIG/hyprland.lua" "$DEST_CONFIG/hypr/hyprland.lua"
+        elif [[ $WM_NAME == "niri" ]]; then
+            echo ">>> Deploying Niri configs..."
+            copy_dir_content "$SOURCE_WM_CONFIG" "$DEST_CONFIG/niri"
+        elif [[ $WM_NAME == "mango" ]]; then
+            echo ">>> Deploying Mango configs..."
+            copy_dir_content "$SOURCE_WM_CONFIG" "$DEST_CONFIG/mango"
+        elif [[ $WM_NAME == "labwc" ]]; then
+            echo ">>> Deploying Labwc configs..."
+            copy_dir_content "$SOURCE_WM_CONFIG" "$DEST_CONFIG/labwc"
+        else
+            log_warn "Unknown WM: $WM_NAME. Skipping WM config deployment."
+        fi
+    done
+
+    echo ">>> Deploying Thunar gtk.css theme..."
+    copy_file "$SOURCE_COMMON_CONFIG/gtk.css" "$DEST_CONFIG/gtk-3.0/gtk.css"
+
+    echo ">>> Deploying .nanorc (nano configuration)..."
+    copy_file "$SOURCE_COMMON_CONFIG/.nanorc" "$HOME/.nanorc"
+
+    echo ">>> Deploying starship.toml (starship configuration)..."
+    copy_file "$SOURCE_COMMON_CONFIG/starship.toml" "$DEST_CONFIG/starship.toml"
+
+    log_ok "Configurations deployed successfully."
+else
+    log_skip "Skipping config deployment."
+fi
+
+# ============================================================================
+# BLOCK 3: BACKUP AND COPY LOCAL BIN
+# ============================================================================
+step_title "3 - BACKUP AND UPDATE ~/.local/bin"
+
+SOURCE_BIN="$COMMON_DIR/local/bin"
+DEST_BIN="$HOME/.local/bin"
+
+if ask_yes_no "===> Do you want to update zspace local/bin scripts now?"; then
+    if [[ -d "$SOURCE_BIN" ]]; then
+        copy_dir_content "$SOURCE_BIN" "$DEST_BIN"
+        chmod +x ~/.local/bin/*
+        log_ok "local/bin update completed."
+    else
+        log_warn "Directory not found: $SOURCE_BIN"
+    fi
+else
+    log_skip "Skipping local/bin update."
+fi
+
+# ============================================================================
+# BLOCK 4: NIXOS CONFIGURATION UPDATE & REBUILD (Optional compatibility)
+# ============================================================================
+if command -v nixos-rebuild >/dev/null 2>&1; then
+    step_title "4 - NIXOS SYSTEM REBUILD"
+    
+    REBUILD_DONE=0
+
+    if [[ -f "/etc/nixos/zspace-config.nix" ]] && grep -q "./zspace-config.nix" "/etc/nixos/configuration.nix"; then
+        log_info "Detected NixOS with Local zspace-config.nix (Offline Mode)."
+        if ask_yes_no "===> Do you want to update local zspace-config.nix and rebuild NixOS now?"; then
+            copy_file "$NIX_DIR/zspace-config.nix" "/etc/nixos/zspace-config.nix"
+            log_info "Rebuilding NixOS system..."
+            sudo nixos-rebuild switch
+            log_ok "NixOS updated and rebuilt successfully via Local Config."
+            REBUILD_DONE=1
+        fi
+    fi
+
+    if [[ "$REBUILD_DONE" -eq 0 ]]; then
+        log_warn "You chose not to rebuild the NixOS system. Please remember to rebuild later to apply system-level changes."
+    fi
+fi
+
+# Init ZSpace Control
+check_control_dir
+
+# Final message
+echo ""
+echo -e "${C_BOLD}${C_CYAN}>>>>>>>>>> Update complete! You may need to restart your session or reload WM to apply changes!${C_RESET}"
+echo -e "${C_MAGENTA}Backup folder for this update: $BACKUP_DIR${C_RESET}"

@@ -1,0 +1,3 @@
+mangowm
+gammastep
+xdg-desktop-portal-wlr
