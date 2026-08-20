@@ -54,11 +54,11 @@ end
 
 # Auto-start Wayland Window Manager on TTY1 login
 if status is-login
-    if test -z "$DISPLAY"; and test (tty) = "/dev/tty1"
+    if test -z "$DISPLAY"; and test (tty 2>/dev/null) = "/dev/tty1"
         # Uncomment and modify to force legacy OpenGL renderer for old GPUs (like Intel HD 3000)
         # set -gx WLR_RENDERER gles2
         
-        if command -v niri-session > /dev/null
+        if command -v niri-session > /dev/null 2>&1
             exec niri-session
         end
     end

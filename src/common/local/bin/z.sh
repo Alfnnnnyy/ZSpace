@@ -7,9 +7,6 @@ need() { command -v "$1" >/dev/null 2>&1 || { echo "$1 is required"; exit 1; }; 
 
 # Check dependencies
 need kitty
-need cava
-need tty-clock
-need lavat
 need jq
 
 # Main
@@ -29,16 +26,19 @@ clear() {
 }
 
 cava() {
+    command -v cava >/dev/null 2>&1 || return 0
     spawn kitty --title "zcava" --class "seycava" -o font_size=$Z_GENERAL_FONT_SIZE sh -c "cava"
     sleep 0.2
 }
 
 lavat() {
+    command -v lavat >/dev/null 2>&1 || return 0
     spawn kitty --title "zlavat" --class "seylavat" -o font_size=$Z_GENERAL_FONT_SIZE sh -c "lavat -c white -k white -r1"
     sleep 0.2
 }
 
 clock() {
+    command -v tty-clock >/dev/null 2>&1 || return 0
     spawn kitty --title "zclock" --class "seyclock" -o font_size=$Z_CLOCK_FONT_SIZE sh -c "tty-clock -c -C 7 -r -b"
     sleep 0.2
 }
