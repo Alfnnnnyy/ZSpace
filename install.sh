@@ -36,6 +36,14 @@ step_title "1 - CHECK AND INSTALL DEPENDENCIES (xbps-install, git, curl)"
 # Check if xbps-install is available (Void Linux)
 if command -v xbps-install >/dev/null 2>&1; then
     log_ok "xbps-install is available (Void Linux)."
+    
+    # Enable nonfree repository for unrar, vscode, etc.
+    if ! xbps-query void-repo-nonfree >/dev/null 2>&1; then
+        log_info "Enabling Void Linux nonfree repository..."
+        sudo xbps-install -Sy void-repo-nonfree >/dev/null 2>&1
+        sudo xbps-install -S >/dev/null 2>&1
+        log_ok "Void Linux nonfree repository enabled."
+    fi
 else
     log_warn "xbps-install not found. If using another distro, install packages manually."
 fi
