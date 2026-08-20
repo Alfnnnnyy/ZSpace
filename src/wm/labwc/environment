@@ -33,8 +33,8 @@ SDL_VIDEODRIVER=wayland
 CLUTTER_BACKEND=wayland
 
 # Performance
-VDPAU_DRIVER=va_gl
-LIBVA_DRIVER_NAME=iHD
+# VDPAU_DRIVER=va_gl
+# LIBVA_DRIVER_NAME=iHD # Auto-detected by Mesa/libva based on GPU
 
 # Input method
 GTK_IM_MODULE=fcitx

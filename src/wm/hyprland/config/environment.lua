@@ -46,8 +46,8 @@ hl.env("SDL_VIDEODRIVER", "wayland")
 hl.env("CLUTTER_BACKEND", "wayland")
 
 -- Performance
-hl.env("VDPAU_DRIVER", "va_gl")
-hl.env("LIBVA_DRIVER_NAME", "iHD")
+-- hl.env("VDPAU_DRIVER", "va_gl")
+-- hl.env("LIBVA_DRIVER_NAME", "iHD") # Auto-detected by Mesa/libva based on GPU
 
 -- Input method
 hl.env("GTK_IM_MODULE", "fcitx")
