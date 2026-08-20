@@ -13,4 +13,9 @@ network-manager-applet        # NetworkManager GTK interface (nm-connection-edit
 blueman                       # Bluetooth interface
 bluez                         # Bluetooth engine
 
+# === Audio (PipeWire) ===
+pipewire                      # Multimedia processing engine
+wireplumber                   # Session / policy manager for PipeWire
+alsa-pipewire                 # ALSA plugin for PipeWire
+
 # Note: ly display manager is not in standard Void repos and should be built from source if desired.
