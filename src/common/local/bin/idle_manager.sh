@@ -3,7 +3,12 @@
 PID_FILE="/tmp/idle_manager_daemon.pid"
 TOGGLE_LOCK="/tmp/idle_manager_toggle.lock"
 CHECK_INTERVAL=2
-HYPRIDLE_PID=""
+DAEMON_PID_VAR=""
+IDLE_BIN="hypridle"
+
+if ! command -v hypridle >/dev/null 2>&1 && command -v swayidle >/dev/null 2>&1; then
+    IDLE_BIN="swayidle"
+fi
 STATE=0 # 0 = running, 1 = paused
 
 log_msg() {
@@ -14,9 +19,9 @@ log_msg() {
 
 cleanup() {
     log_msg "INFO: Exiting daemon..."
-    if [ -n "$HYPRIDLE_PID" ] && [ "$STATE" -eq 1 ]; then
-        log_msg "CLEANUP: Resuming hypridle before exit..."
-        kill -CONT "$HYPRIDLE_PID" 2>/dev/null
+    if [ -n "$DAEMON_PID_VAR" ] && [ "$STATE" -eq 1 ]; then
+        log_msg "CLEANUP: Resuming $IDLE_BIN before exit..."
+        kill -CONT "$DAEMON_PID_VAR" 2>/dev/null
     fi
     rm -f "$PID_FILE"
     exit 0
@@ -24,12 +29,12 @@ cleanup() {
 
 show_help() {
     echo "Usage: $0 [OPTION]"
-    echo "Manage hypridle and monitor audio to prevent screen from sleeping."
+    echo "Manage idle daemon ($IDLE_BIN) and monitor audio to prevent screen from sleeping."
     echo ""
     echo "Options:"
     echo "  --help      Show this help message."
     echo "  --startup   Start the audio monitoring daemon (prints log to stdout)."
-    echo "  --toggle    Toggle hypridle and the monitoring daemon on/off."
+    echo "  --toggle    Toggle idle daemon and the monitoring daemon on/off."
     echo "  --check     Check if the daemon is currently running."
 }
 
@@ -63,19 +68,19 @@ run_daemon() {
     log_msg "INFO: Idle manager daemon started successfully (PID: $$)."
     
     while true; do
-        HYPRIDLE_PID=$(pgrep -x -u "$USER" hypridle | head -n 1)
+        DAEMON_PID_VAR=$(pgrep -x -u "$USER" "$IDLE_BIN" | head -n 1)
 
-        if [ -n "$HYPRIDLE_PID" ]; then
+        if [ -n "$DAEMON_PID_VAR" ]; then
             if is_audio_playing; then
                 if [ "$STATE" -eq 0 ]; then
-                    kill -STOP "$HYPRIDLE_PID" 2>/dev/null
-                    log_msg "ACTION: Audio detected. Suspended hypridle (PID: $HYPRIDLE_PID)."
+                    kill -STOP "$DAEMON_PID_VAR" 2>/dev/null
+                    log_msg "ACTION: Audio detected. Suspended $IDLE_BIN (PID: $DAEMON_PID_VAR)."
                     STATE=1
                 fi
             else
                 if [ "$STATE" -eq 1 ]; then
-                    kill -CONT "$HYPRIDLE_PID" 2>/dev/null
-                    log_msg "ACTION: Audio stopped. Resumed hypridle (PID: $HYPRIDLE_PID)."
+                    kill -CONT "$DAEMON_PID_VAR" 2>/dev/null
+                    log_msg "ACTION: Audio stopped. Resumed $IDLE_BIN (PID: $DAEMON_PID_VAR)."
                     STATE=0
                 fi
             fi
@@ -97,26 +102,30 @@ toggle_service() {
     fi
 
     if [ "$DAEMON_RUNNING" -eq 1 ]; then
-        log_msg "TOGGLE: Stopping hypridle and daemon..."
-        notify-send "Idle Manager" "Stopping hypridle and daemon..."
+        log_msg "TOGGLE: Stopping $IDLE_BIN and daemon..."
+        notify-send "Idle Manager" "Stopping $IDLE_BIN and daemon..."
         
         kill -TERM "$DAEMON_PID" 2>/dev/null
         rm -f "$PID_FILE" 2>/dev/null
         
-        pkill -CONT -x -u "$USER" hypridle 2>/dev/null
-        pkill -TERM -x -u "$USER" hypridle 2>/dev/null
+        pkill -CONT -x -u "$USER" "$IDLE_BIN" 2>/dev/null
+        pkill -TERM -x -u "$USER" "$IDLE_BIN" 2>/dev/null
         sleep 0.2
         
         log_msg "TOGGLE: All services stopped."
     else
-        log_msg "TOGGLE: Starting hypridle and daemon..."
-        notify-send "Idle Manager" "Starting hypridle and daemon..."
+        log_msg "TOGGLE: Starting $IDLE_BIN and daemon..."
+        notify-send "Idle Manager" "Starting $IDLE_BIN and daemon..."
         
-        pkill -CONT -x -u "$USER" hypridle 2>/dev/null
-        pkill -TERM -x -u "$USER" hypridle 2>/dev/null
+        pkill -CONT -x -u "$USER" "$IDLE_BIN" 2>/dev/null
+        pkill -TERM -x -u "$USER" "$IDLE_BIN" 2>/dev/null
         sleep 0.2
         
-        hypridle 201>&- &
+        if [ "$IDLE_BIN" = "swayidle" ]; then
+            swayidle -w timeout 300 "$HOME/.local/bin/lock.sh" timeout 600 'niri msg action power-off-monitors' 201>&- &
+        else
+            hypridle 201>&- &
+        fi
         disown
         
         SCRIPT_PATH=$(realpath "$0")

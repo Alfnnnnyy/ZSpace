@@ -6,9 +6,9 @@ WIDTH=""
 HEIGHT=""
 
 # Check dependencies
-if ! command -v hyprlock &> /dev/null; then
-    echo "hyprlock is not installed. Please install it to use this script."
-    notify-send "Lock screen" "hyprlock is not installed. Please install it to use this script."
+if ! command -v hyprlock &> /dev/null && ! command -v swaylock &> /dev/null; then
+    echo "Neither hyprlock nor swaylock is installed. Please install one to use this script."
+    notify-send "Lock screen" "Neither hyprlock nor swaylock is installed."
     exit 1
 fi
 
@@ -59,9 +59,17 @@ if [[ -z "$WIDTH" || -z "$HEIGHT" ]]; then
     notify-send "Lock screen" "Could not determine monitor resolution. How it could be..."
 fi
 
-echo "Executing hyprlock with appropriate configuration..."
-if [[ "$WIDTH" -ge 1920 && "$HEIGHT" -ge 1080 ]]; then
-    hyprlock
+if command -v hyprlock &> /dev/null; then
+    echo "Executing hyprlock with appropriate configuration..."
+    if [[ "$WIDTH" -ge 1920 && "$HEIGHT" -ge 1080 ]]; then
+        hyprlock
+    else
+        hyprlock -c ~/.config/hypr/hyprlock_tiny.conf
+    fi
+elif command -v swaylock &> /dev/null; then
+    echo "Executing swaylock..."
+    swaylock -c 000000
 else
-    hyprlock -c ~/.config/hypr/hyprlock_tiny.conf
+    echo "Neither hyprlock nor swaylock is installed."
+    exit 1
 fi

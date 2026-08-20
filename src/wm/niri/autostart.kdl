@@ -10,7 +10,7 @@
 spawn-at-startup "dbus-update-activation-environment" "--all" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
 spawn-at-startup "sh" "-c" "$HOME/.local/bin/polkit_start.sh"
 spawn-at-startup "swaync"
-spawn-at-startup "hypridle"
+spawn-at-startup "sh" "-c" "if command -v hypridle >/dev/null; then hypridle; elif command -v swayidle >/dev/null; then swayidle -w timeout 300 '$HOME/.local/bin/lock.sh' timeout 600 'niri msg action power-off-monitors'; fi"
 spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
 spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
 spawn-at-startup "nm-applet" "--indicator"
