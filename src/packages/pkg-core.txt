@@ -1,5 +1,5 @@
 # === Core packages for ZSpace (Void Linux / XBPS) ===
-waybar                        # Wayland status bar
+Waybar                        # Wayland status bar (Capital W in Void)
 rofi                          # App launcher and dmenu replacement
 swaync                        # Notification daemon + notification center
 kitty                         # GPU-accelerated terminal emulator
@@ -13,8 +13,8 @@ fish                          # Shell
 
 # === ZSpace scripts needed ===
 jq                            # Command-line JSON processor
-ImageMagick                   # Image processing toolkit (For Niri, generating backdrop blur)
-python3-colorthief            # Extract dominant color palette from images (Function wallpaper color picker)
+ImageMagick                   # Image processing toolkit
+python3-colorthief            # Extract dominant color palette from images
 python3-gobject               # Python bindings for GObject
 gtk-layer-shell               # GTK library for layer shell protocol
 wlr-randr                     # Wayland output management utility
@@ -39,7 +39,7 @@ xdg-desktop-portal            # Base desktop portal service
 xdg-desktop-portal-gtk        # GTK portal backend
 xdg-utils                     # xdg-open, xdg-mime, and related desktop helpers
 mate-polkit                   # MATE PolicyKit authentication agent
-xhost                         # X server access control utility (compat use-cases)
+xhost                         # X server access control utility
 
 qt6ct                         # Qt6 theme/configuration tool
 qt5ct                         # Qt5 theme/configuration tool
@@ -47,7 +47,7 @@ qt5-wayland                   # Qt5 Wayland platform plugin
 qt6-wayland                   # Qt6 Wayland platform plugin
 
 # === File management / archive tools ===
-Thunar                        # File manager
+Thunar                        # File manager (Capital T in Void)
 thunar-archive-plugin         # Archive integration for Thunar
 thunar-volman                 # Auto-mount and removable media handling
 file-roller                   # Archive manager GUI

@@ -147,14 +147,33 @@ install_pkg_file() {
     fi
 
     local pkgs
-    pkgs=$(sed 's/[[:space:]]*#.*$//' "$file" | grep -E '^[a-zA-Z0-9@._+-]+$' | tr '\n' ' ')
-    if [[ -n "$pkgs" ]]; then
-        if sudo xbps-install -Sy $pkgs; then
-            log_ok "[$label] Installed successfully via xbps."
+    mapfile -t pkgs < <(sed 's/[[:space:]]*#.*$//' "$file" | grep -E '^[a-zA-Z0-9@._+-]+$')
+    
+    if [[ ${#pkgs[@]} -gt 0 ]]; then
+        if sudo xbps-install -Sy "${pkgs[@]}"; then
+            log_ok "[$label] All packages installed successfully via xbps."
             return 0
         else
-            log_error "[$label] Installation failed via xbps."
-            return 1
+            log_warn "[$label] Batch install failed. Falling back to individual package installation..."
+            local installed_count=0
+            local failed_pkgs=()
+
+            for pkg in "${pkgs[@]}"; do
+                if sudo xbps-install -Sy "$pkg"; then
+                    ((installed_count++))
+                else
+                    log_warn "[$label] Not found in repo or skipped: $pkg"
+                    failed_pkgs+=("$pkg")
+                fi
+            done
+
+            if [[ "$installed_count" -gt 0 ]]; then
+                log_ok "[$label] Installed $installed_count package(s)."
+            fi
+            if [[ ${#failed_pkgs[@]} -gt 0 ]]; then
+                log_warn "[$label] Packages not in official XBPS repos: ${failed_pkgs[*]}"
+            fi
+            return 0
         fi
     else
         log_warn "[$label] No packages to install."

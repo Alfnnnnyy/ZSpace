@@ -1,6 +1,3 @@
-# === Login manager ===
-ly                            # TUI display/login manager (runit service: /etc/sv/ly)
-
 # === Service tools / Useful utilities tools ===
 brightnessctl                 # Brightness control utility
 ncdu                          # Disk usage analyzer (interactive TUI)
@@ -15,3 +12,5 @@ dbus                          # DBus message bus daemon
 network-manager-applet        # NetworkManager GTK interface (nm-connection-editor)
 blueman                       # Bluetooth interface
 bluez                         # Bluetooth engine
+
+# Note: ly display manager is not in standard Void repos and should be built from source if desired.
