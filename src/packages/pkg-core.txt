@@ -6,9 +6,6 @@ kitty                         # GPU-accelerated terminal emulator
 fastfetch                     # Fast system information display
 awww                          # Wallpaper daemon
 mpvpaper                      # Video wallpaper
-hyprlock                      # Screen locker
-hypridle                      # Idle management
-hyprpicker                    # Color picker
 fish-shell                    # Shell (fish-shell in Void)
 
 # === ZSpace scripts needed ===
