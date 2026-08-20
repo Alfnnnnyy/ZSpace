@@ -274,14 +274,62 @@ deploy_assets_from_archive_repo() {
         fi
     fi
 
-    if [[ ! -f "$ARCHIVE_DIR/setup.sh" ]]; then
-        log_error "setup.sh not found in $ARCHIVE_DIR"
-        return 1
+    local ICON_DIR="$HOME/.icons"
+    local THEME_DIR="$HOME/.themes"
+    local WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+    mkdir -p "$ICON_DIR" "$THEME_DIR" "$WALLPAPER_DIR"
+
+    # Install Bibata Cursor
+    echo ""
+    echo " [1]. Bibata-Modern-Ice.tar.gz (from archive) - one icon set"
+    echo " [0]. Skip cursor installation"
+    echo ""
+    read -r -p ">>> Select an option (1 or 0): " cursor_choice
+    case $cursor_choice in
+        1)
+            if [ -f "$ARCHIVE_DIR/Bibata-Modern-Ice.tar.gz" ]; then
+                log_info "Installing Bibata-Modern-Ice cursor..."
+                tar -xzf "$ARCHIVE_DIR/Bibata-Modern-Ice.tar.gz" -C "$ICON_DIR"
+                log_ok "Bibata cursor installed."
+            else
+                log_warn "Archive not found: $ARCHIVE_DIR/Bibata-Modern-Ice.tar.gz"
+            fi
+            ;;
+        0)
+            log_skip "Skipping Bibata Cursor installation."
+            ;;
+        *)
+            log_warn "Invalid option. Skipping cursor."
+            ;;
+    esac
+
+    # Install Tela Icon Theme
+    if ask_yes_no "===> Do you want to install Tela Icon Theme?"; then
+        log_info "Cloning and installing Tela Icon Theme..."
+        git clone https://github.com/vinceliuice/Tela-icon-theme "$ARCHIVE_DIR/Tela-icon-theme"
+        (cd "$ARCHIVE_DIR/Tela-icon-theme" && ./install.sh -d "$ICON_DIR" -c "black")
+        rm -rf "$ARCHIVE_DIR/Tela-icon-theme"
+        log_ok "Tela Icon Theme installed."
     fi
 
-    chmod +x "$ARCHIVE_DIR/setup.sh"
-    log_info "Running archive setup script..."
-    (cd "$ARCHIVE_DIR" && ./setup.sh)
+    # Install Midnight Gray Theme
+    if ask_yes_no "===> Do you want to install Midnight Gray Theme?"; then
+        log_info "Cloning and installing Midnight Gray Theme..."
+        git clone https://github.com/i-mint/midnight "$ARCHIVE_DIR/midnight"
+        cp -r "$ARCHIVE_DIR/midnight/Midnight-Gray" "$THEME_DIR/"
+        rm -rf "$ARCHIVE_DIR/midnight"
+        log_ok "Midnight Gray Theme installed."
+    fi
+
+    # Copy Wallpapers
+    if ask_yes_no "===> Do you want to copy wallpapers to ~/Pictures/Wallpapers/?"; then
+        if [ -d "$ARCHIVE_DIR/Wallpapers" ]; then
+            cp -r "$ARCHIVE_DIR/Wallpapers/"* "$WALLPAPER_DIR/"
+            log_ok "Wallpapers copied."
+        else
+            log_warn "Wallpapers folder not found in archive."
+        fi
+    fi
 }
 
 # Check ~/zspace-control directory:
