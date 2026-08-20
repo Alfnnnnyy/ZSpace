@@ -44,18 +44,16 @@ if command -v xbps-install >/dev/null 2>&1; then
         sudo xbps-install -S >/dev/null 2>&1
         log_ok "Void Linux nonfree repository enabled."
     fi
-else
-    log_warn "xbps-install not found. If using another distro, install packages manually."
-fi
 
-# Auto-add Hyprland community repo if Hyprland is selected and not found in base Void repos
-if [[ " ${SELECTED_WMS[*]} " =~ " hyprland " ]] && command -v xbps-install >/dev/null 2>&1; then
-    if ! xbps-query hyprland >/dev/null 2>&1; then
-        log_info "Hyprland selected. Adding Void Hyprland community repository..."
+    # Auto-add Hyprland community repo for hyprlock & hypridle (used by lock & idle scripts across all WMs)
+    if ! xbps-query hyprlock >/dev/null 2>&1; then
+        log_info "Adding Hyprland community repository for hyprlock & hypridle..."
         echo 'repository=https://github.com/void-land/hyprland-void-packages/releases/latest/download/' | sudo tee /etc/xbps.d/hyprland-packages.conf >/dev/null
         sudo xbps-install -S >/dev/null 2>&1
         log_ok "Hyprland community repository added successfully."
     fi
+else
+    log_warn "xbps-install not found. If using another distro, install packages manually."
 fi
 
 DEPENDENCIES=("git" "curl")
