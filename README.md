@@ -68,7 +68,7 @@ See package lists in:
 ### 1. Clone ZSpace
 ```bash
 cd ~
-git clone <your-zspace-repo-url> ~/zspace
+git clone https://github.com/Alfnnnnyy/ZSpace.git ~/zspace
 ```
 
 ### 2. Run Installation Script
@@ -80,11 +80,12 @@ chmod +x install.sh
 
 The script will handle package installation via `xbps-install`, setup configuration files, and enable the `ly` runit service (`/var/service/ly`).
 
-### 3. Update ZSpace
+### 3. Note for Hyprland Users on Void Linux
+Because Hyprland, `hyprlock`, and `hypridle` are maintained in community repositories for Void Linux, Hyprland users can add the community repository before installing:
 ```bash
-cd ~/zspace
-chmod +x update.sh
-./update.sh
+echo 'repository=https://github.com/void-land/hyprland-void-packages/releases/latest/download/' | sudo tee /etc/xbps.d/hyprland-packages.conf
+sudo xbps-install -S
+sudo xbps-install -Sy hyprland hyprlock hypridle hyprpicker hyprsunset
 ```
 
 ---
