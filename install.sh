@@ -40,6 +40,16 @@ else
     log_warn "xbps-install not found. If using another distro, install packages manually."
 fi
 
+# Auto-add Hyprland community repo if Hyprland is selected and not found in base Void repos
+if [[ " ${SELECTED_WMS[*]} " =~ " hyprland " ]] && command -v xbps-install >/dev/null 2>&1; then
+    if ! xbps-query hyprland >/dev/null 2>&1; then
+        log_info "Hyprland selected. Adding Void Hyprland community repository..."
+        echo 'repository=https://github.com/void-land/hyprland-void-packages/releases/latest/download/' | sudo tee /etc/xbps.d/hyprland-packages.conf >/dev/null
+        sudo xbps-install -S >/dev/null 2>&1
+        log_ok "Hyprland community repository added successfully."
+    fi
+fi
+
 DEPENDENCIES=("git" "curl")
 for pkg in "${DEPENDENCIES[@]}"; do
     if command -v "$pkg" >/dev/null 2>&1; then
@@ -226,13 +236,6 @@ if ask_yes_no "===> Do you want to setup zspace config now?"; then
     copy_file "$SOURCE_COMMON_CONFIG/hypr/hypridle.conf" "$DEST_CONFIG/hypr/hypridle.conf"
     copy_file "$SOURCE_COMMON_CONFIG/hypr/hyprlock.conf" "$DEST_CONFIG/hypr/hyprlock.conf"
     copy_file "$SOURCE_COMMON_CONFIG/hypr/hyprlock_tiny.conf" "$DEST_CONFIG/hypr/hyprlock_tiny.conf"
-
-    echo ">>> Deploying Once configs..."
-    for folder in "$SOURCE_ONCE_CONFIG"/*/; do
-        [[ -d "$folder" ]] || continue
-        folder_name="$(basename "$folder")"
-        copy_dir_content "$SOURCE_ONCE_CONFIG/$folder_name" "$DEST_CONFIG/$folder_name"
-    done
 
     # Loop through selected WMs (hyprland will always be last if "ALL" was chosen)
     for i in "${!SELECTED_WMS[@]}"; do
