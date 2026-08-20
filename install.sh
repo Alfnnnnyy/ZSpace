@@ -41,7 +41,6 @@ if command -v xbps-install >/dev/null 2>&1; then
     if ! xbps-query void-repo-nonfree >/dev/null 2>&1; then
         log_info "Enabling Void Linux nonfree repository..."
         sudo xbps-install -Sy void-repo-nonfree
-        sudo xbps-install -S
         log_ok "Void Linux nonfree repository enabled."
     fi
 
