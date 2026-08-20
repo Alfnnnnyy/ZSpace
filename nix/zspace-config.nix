@@ -17,19 +17,19 @@ in
         enable = lib.mkOption {
             type = lib.types.bool;
             default = true;
-            description = "Enable Hakuspace NixOS base configuration";
+            description = "Enable ZSpace NixOS base configuration";
         };
 
         enableZshShell = lib.mkOption {
             type = lib.types.bool;
             default = false;
-            description = "Enable Zsh with Hakuspace default configuration and set as default shell";
+            description = "Enable Zsh with ZSpace default configuration and set as default shell";
         };
 
         enableFishShell = lib.mkOption {
             type = lib.types.bool;
             default = true;
-            description = "Enable Fish with Starship and Hakuspace default configuration and set as default shell";
+            description = "Enable Fish with Starship and ZSpace default configuration and set as default shell";
         };
     };
 
@@ -192,7 +192,7 @@ in
                 ];
                 
                 shellAliases = {
-                    haku = "~/.local/bin/z.sh";
+                    z = "~/.local/bin/z.sh";
                     menu = "~/.local/bin/zmenu.sh";
                     openconfig = "~/.local/bin/open_config.sh";
                     nix-clean = "sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations +3 && sudo nix-store --gc";

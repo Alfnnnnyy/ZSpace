@@ -26,7 +26,7 @@ PKG_MANGO="$SOURCE_DIR/packages/pkg-mango.txt"
 PKG_LABWC="$SOURCE_DIR/packages/pkg-labwc.txt"
 
 # zspace-archive repo URL and directory
-ARCHIVE_REPO_URL="https://github.com/hakuimaku/zspace-archive.git"
+ARCHIVE_REPO_URL="https://github.com/hakuimaku/hakuspace-archive.git"
 ARCHIVE_DIR="$HOME/zspace-archive"
 
 # zspace-control directory

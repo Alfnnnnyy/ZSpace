@@ -1,9 +1,9 @@
-# Example flake.nix for a NixOS configuration using Hakuspace NixOS modules.
-# This flake.nix file using ONLINE remote to fetch Hakuspace NixOS modules from GitHub
+# Example flake.nix for a NixOS configuration using ZSpace NixOS modules.
+# This flake.nix file using ONLINE remote to fetch ZSpace NixOS modules from GitHub
 # If you don't want to use the online remote, you just can import my zspace-config.nix file directly in your configuration.nix file.
 
 {
-    description = "System Configuration powered by Hakuspace NixOS";
+    description = "System Configuration powered by ZSpace NixOS";
 
     inputs = {
         nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";

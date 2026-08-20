@@ -1,5 +1,5 @@
 {
-	description = "Hakuspace NixOS Configuration";
+	description = "ZSpace NixOS Configuration";
 
 	inputs = {
 		nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
