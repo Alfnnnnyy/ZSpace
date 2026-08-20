@@ -229,6 +229,19 @@ fi
 # Init ZSpace Control
 check_control_dir
 
+# Auto-enable essential Void Linux runit services
+VOID_SERVICES=("dbus" "elogind" "power-profiles-daemon")
+for svc in "${VOID_SERVICES[@]}"; do
+    if [ -d "/etc/sv/$svc" ]; then
+        if [ ! -L "/var/service/$svc" ]; then
+            sudo ln -sf "/etc/sv/$svc" /var/service/
+            log_ok "Enabled Void runit service: $svc"
+        else
+            log_skip "Service $svc is already enabled."
+        fi
+    fi
+done
+
 # Final message
 echo ""
 echo -e "${C_BOLD}${C_CYAN}>>>>>>>>>> Update complete! You may need to restart your session or reload WM to apply changes!${C_RESET}"

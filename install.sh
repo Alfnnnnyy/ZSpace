@@ -368,8 +368,21 @@ fi
 # Init ZSpace Control
 check_control_dir
 
-# NixOS configuration update
-if command -v nixos-rebuild >/dev/null 2>&1; then
+# Auto-enable essential Void Linux runit services
+VOID_SERVICES=("dbus" "elogind" "power-profiles-daemon")
+for svc in "${VOID_SERVICES[@]}"; do
+    if [ -d "/etc/sv/$svc" ]; then
+        if [ ! -L "/var/service/$svc" ]; then
+            sudo ln -sf "/etc/sv/$svc" /var/service/
+            log_ok "Enabled Void runit service: $svc"
+    else
+            log_skip "Service $svc is already enabled."
+    fi
+    fi
+done
+
+# Check if ly runit service is installed (Void Linux runit)
+if [ -d "/etc/sv/ly" ]; then
     if ask_yes_no "===> NixOS configuration updated. Do you want to rebuild NixOS system now? (maybe have some conflicts)"; then
         sudo nixos-rebuild switch
     else
