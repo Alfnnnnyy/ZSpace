@@ -40,8 +40,8 @@ if command -v xbps-install >/dev/null 2>&1; then
     # Enable nonfree repository for unrar, vscode, etc.
     if ! xbps-query void-repo-nonfree >/dev/null 2>&1; then
         log_info "Enabling Void Linux nonfree repository..."
-        sudo xbps-install -Sy void-repo-nonfree >/dev/null 2>&1
-        sudo xbps-install -S >/dev/null 2>&1
+        sudo xbps-install -Sy void-repo-nonfree
+        sudo xbps-install -S
         log_ok "Void Linux nonfree repository enabled."
     fi
 
@@ -49,7 +49,7 @@ if command -v xbps-install >/dev/null 2>&1; then
     if ! xbps-query hyprlock >/dev/null 2>&1; then
         log_info "Adding Hyprland community repository for hyprlock & hypridle..."
         echo 'repository=https://github.com/void-land/hyprland-void-packages/releases/latest/download/' | sudo tee /etc/xbps.d/hyprland-packages.conf >/dev/null
-        sudo xbps-install -S >/dev/null 2>&1
+        sudo xbps-install -S
         log_ok "Hyprland community repository added successfully."
     fi
 else
