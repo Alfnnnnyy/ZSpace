@@ -1,7 +1,7 @@
 # === Core packages for ZSpace (Void Linux / XBPS) ===
 Waybar                        # Wayland status bar (Capital W in Void)
 rofi                          # App launcher and dmenu replacement
-swaync                        # Notification daemon + notification center
+SwayNotificationCenter        # Notification daemon + notification center (Full name in Void)
 kitty                         # GPU-accelerated terminal emulator
 fastfetch                     # Fast system information display
 awww                          # Wallpaper daemon
@@ -9,7 +9,7 @@ mpvpaper                      # Video wallpaper
 hyprlock                      # Screen locker
 hypridle                      # Idle management
 hyprpicker                    # Color picker
-fish                          # Shell
+fish-shell                    # Shell (fish-shell in Void)
 
 # === ZSpace scripts needed ===
 jq                            # Command-line JSON processor
@@ -56,13 +56,12 @@ gvfs-mtp                      # MTP device support (Android phones)
 tumbler                       # Thumbnailing service
 ffmpegthumbnailer             # Video thumbnail generator
 7zip                          # 7z archive toolset
-unrar                         # RAR extraction support
 unzip                         # ZIP extraction support
 zip                           # ZIP creation utility
 
 # === Fonts ===
 rofi-emoji                    # Emoji font, Rofi menu selector
-font-noto-ttf                 # General Unicode font family
-font-noto-cjk                 # CJK font coverage
-font-noto-emoji               # Emoji font set
-font-jetbrains-mono-nerd      # Nerd Font for terminal/status bar glyphs
+noto-fonts-ttf                # General Unicode font family
+noto-fonts-cjk                # CJK font coverage
+noto-fonts-emoji              # Emoji font set
+nerd-fonts                    # Nerd Font for terminal/status bar glyphs
