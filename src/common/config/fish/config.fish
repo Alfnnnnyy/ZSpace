@@ -51,3 +51,15 @@ if status is-interactive
     abbr xbpssize 'xbps-query -l'
     abbr xbpsclean 'sudo xbps-remove -O -o'
 end
+
+# Auto-start Wayland Window Manager on TTY1 login
+if status is-login
+    if test -z "$DISPLAY"; and test (tty) = "/dev/tty1"
+        # Uncomment and modify to force legacy OpenGL renderer for old GPUs (like Intel HD 3000)
+        # set -gx WLR_RENDERER gles2
+        
+        if command -v niri-session > /dev/null
+            exec niri-session
+        end
+    end
+end
