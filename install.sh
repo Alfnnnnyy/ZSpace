@@ -130,6 +130,11 @@ done
 if [[ "$selected_count" -eq 0 ]]; then
     log_skip "No package group selected. Skipping Block 2."
 else
+    # Sync repos once before installing all package groups
+    log_info "Syncing package repositories..."
+    sudo xbps-install -S
+    log_ok "Repository sync complete."
+
     for i in "${!PKG_LABELS[@]}"; do
         if [[ "${INSTALL_FLAGS[$i]}" -eq 1 ]]; then
             install_pkg_file "${PKG_LABELS[$i]}" "${PKG_FILES[$i]}"

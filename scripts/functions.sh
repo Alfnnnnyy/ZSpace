@@ -150,7 +150,7 @@ install_pkg_file() {
     mapfile -t pkgs < <(sed 's/[[:space:]]*#.*$//' "$file" | grep -E '^[a-zA-Z0-9@._+-]+$')
     
     if [[ ${#pkgs[@]} -gt 0 ]]; then
-        if sudo xbps-install -Sy "${pkgs[@]}"; then
+        if sudo xbps-install -y "${pkgs[@]}"; then
             log_ok "[$label] All packages installed successfully via xbps."
             return 0
         else
@@ -159,7 +159,7 @@ install_pkg_file() {
             local failed_pkgs=()
 
             for pkg in "${pkgs[@]}"; do
-                if sudo xbps-install -Sy "$pkg"; then
+                if sudo xbps-install -y "$pkg"; then
                     ((installed_count++))
                 else
                     log_warn "[$label] Not found in repo or skipped: $pkg"
