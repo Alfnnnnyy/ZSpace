@@ -7,6 +7,7 @@ gparted                       # Disk partition editor GUI
 nano                          # Terminal text editor
 elogind                       # Logind daemon for Void Linux (runit/loginctl)
 dbus                          # DBus message bus daemon
+power-profiles-daemon         # Power profiles management (performance/battery)
 
 # === Network / Bluetooth ===
 network-manager-applet        # NetworkManager GTK interface (nm-connection-editor)
