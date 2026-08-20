@@ -8,6 +8,8 @@ awww                          # Wallpaper daemon
 mpvpaper                      # Video wallpaper
 hyprlock                      # Screen locker
 hypridle                      # Idle management
+swaylock                      # Fallback Wayland screen locker
+swayidle                      # Fallback Idle management
 hyprpicker                    # Color picker
 fish-shell                    # Shell (fish-shell in Void)
 
