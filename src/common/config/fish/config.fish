@@ -1,3 +1,13 @@
+# Auto-start Wayland Window Manager on TTY1 login (must run before interactive block)
+if test -z "$DISPLAY"; and test (tty 2>/dev/null) = "/dev/tty1"
+    # Uncomment to force legacy OpenGL renderer for old GPUs (e.g. Intel HD 3000)
+    # set -gx WLR_RENDERER gles2
+
+    if command -v niri-session > /dev/null 2>&1
+        exec niri-session
+    end
+end
+
 if status is-interactive
     # Starship custom prompt
     command -v starship &> /dev/null && starship init fish | source
@@ -16,7 +26,6 @@ if status is-interactive
 
     # Env
     set -gx GTK_USE_PORTAL 1
-    set -gx MOZ_ENABLE_WAYLAND 1
     set -gx QT_QPA_PLATFORMTHEME qt6ct
     set -gx DOTNET_ROOT $HOME/.dotnet
 
@@ -50,16 +59,4 @@ if status is-interactive
     abbr openconfig '~/.local/bin/open_config.sh'
     abbr xbpssize 'xbps-query -l'
     abbr xbpsclean 'sudo xbps-remove -O -o'
-end
-
-# Auto-start Wayland Window Manager on TTY1 login
-if status is-login
-    if test -z "$DISPLAY"; and test (tty 2>/dev/null) = "/dev/tty1"
-        # Uncomment and modify to force legacy OpenGL renderer for old GPUs (like Intel HD 3000)
-        # set -gx WLR_RENDERER gles2
-        
-        if command -v niri-session > /dev/null 2>&1
-            exec niri-session
-        end
-    end
 end
